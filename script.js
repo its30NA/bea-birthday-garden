@@ -13,9 +13,15 @@ const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').mat
 // below is a bare magic number. Durations are in milliseconds.
 const CONFIG = {
   music: {
-    // Swap this single path for a different recording later — everything
-    // else (button, playback state) keeps working unchanged.
-    src: 'assets/music/birthday-piano.mp3',
+    // Served via jsDelivr's GitHub CDN mirror rather than the GitHub Pages
+    // URL directly: GitHub Pages has no way to set custom response headers,
+    // and it serves .mp3 as "audio/mp3" (non-standard) instead of the
+    // correct "audio/mpeg" -- Chrome tolerates that, real Safari on iPhone
+    // silently refuses to play it. jsDelivr mirrors the same repo file
+    // with the correct MIME type. To replace the track later, just push
+    // a new file at the same path -- this URL keeps working unchanged
+    // (it may take a few hours for jsDelivr's cache to pick up the change).
+    src: 'https://cdn.jsdelivr.net/gh/its30NA/bea-birthday-garden@main/assets/music/birthday-piano.mp3',
   },
   fireflies: {
     count: 24,
