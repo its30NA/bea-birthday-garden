@@ -129,6 +129,14 @@ function initGarden() {
 function handleBloom(plant, totalPlants) {
   if (plant.classList.contains('bloomed')) return;
 
+  // Some in-app browsers (e.g. WhatsApp's) block the autoplay attempt on
+  // the Begin tap even though it's a genuine user gesture. Every flower
+  // tap is another one, so retry here -- unless the person deliberately
+  // stopped the music themselves, in which case leave it be.
+  if (!musicPlaying && !musicManuallyStopped) {
+    startMusic();
+  }
+
   plant.classList.add('bloomed', 'tap-bounce');
   setTimeout(() => plant.classList.remove('tap-bounce'), CONFIG.bloom.tapBounceMs);
   setTimeout(() => createSparkles(plant.querySelector('.sparkle-burst')), CONFIG.bloom.sparkleAtMs);
@@ -257,6 +265,7 @@ let musicLabel;
 let musicIcon;
 let audioEl;
 let musicPlaying = false;
+let musicManuallyStopped = false; // true only once the person taps the button to stop it
 
 function initMusic() {
   musicBtn = document.getElementById('musicBtn');
@@ -274,6 +283,7 @@ function initMusic() {
 }
 
 function startMusic() {
+  musicManuallyStopped = false;
   if (!audioEl.src) {
     audioEl.src = CONFIG.music.src;
   }
@@ -291,6 +301,7 @@ function startMusic() {
 function pauseMusic() {
   audioEl.pause();
   musicPlaying = false;
+  musicManuallyStopped = true;
   updateMusicUI();
 }
 
