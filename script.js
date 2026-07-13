@@ -108,6 +108,7 @@ function beginExperience() {
   const intro = document.getElementById('sceneIntro');
   const garden = document.getElementById('sceneGarden');
 
+  startMusic(); // called directly from the tap so autoplay is allowed
   intro.classList.add('is-leaving');
   setTimeout(() => {
     intro.hidden = true;
@@ -247,26 +248,56 @@ function startMagicMoment() {
 }
 
 /* ---------- Music ---------- */
+/* Playback is started from the Begin-button tap (see beginExperience),
+   since that's the user gesture browsers require for audio autoplay.
+   The floating button just reflects/toggles the resulting state. */
+
+let musicBtn;
+let musicLabel;
+let musicIcon;
+let audioEl;
+let musicPlaying = false;
 
 function initMusic() {
-  const musicBtn = document.getElementById('musicBtn');
-  const musicLabel = document.getElementById('musicLabel');
-  const audio = document.getElementById('bgMusic');
-  let playing = false;
+  musicBtn = document.getElementById('musicBtn');
+  musicLabel = document.getElementById('musicLabel');
+  musicIcon = document.querySelector('.music-icon');
+  audioEl = document.getElementById('bgMusic');
 
   musicBtn.addEventListener('click', () => {
-    if (!audio.src) {
-      audio.src = CONFIG.music.src;
-    }
-    if (playing) {
-      audio.pause();
+    if (musicPlaying) {
+      pauseMusic();
     } else {
-      audio.play().catch(() => { /* playback needs a user gesture on some browsers; the tap itself provides one */ });
+      startMusic();
     }
-    playing = !playing;
-    musicBtn.setAttribute('aria-pressed', String(playing));
-    musicLabel.textContent = playing ? 'Pause Music' : 'Play Music';
   });
+}
+
+function startMusic() {
+  if (!audioEl.src) {
+    audioEl.src = CONFIG.music.src;
+  }
+  audioEl.play().then(() => {
+    musicPlaying = true;
+    updateMusicUI();
+  }).catch(() => {
+    // Autoplay was blocked (rare, but some browsers still require a more
+    // direct tap on the button itself) -- it just stays offered as "Play Music".
+    musicPlaying = false;
+    updateMusicUI();
+  });
+}
+
+function pauseMusic() {
+  audioEl.pause();
+  musicPlaying = false;
+  updateMusicUI();
+}
+
+function updateMusicUI() {
+  musicBtn.setAttribute('aria-pressed', String(musicPlaying));
+  musicLabel.textContent = musicPlaying ? 'Stop Music' : 'Play Music';
+  musicIcon.textContent = musicPlaying ? '⏹' : '♪';
 }
 
 /* ---------- Hidden surprise: tiny tap stars, once the story is over ---------- */
