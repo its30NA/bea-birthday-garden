@@ -1,0 +1,662 @@
+/* =============================================================
+   Bea's Birthday Garden — stylesheet
+   Palette, type and the original flower concept are preserved
+   from the first version; everything else is built to support
+   the cinematic scene sequence described in script.js.
+   ============================================================= */
+
+/* ---------- 1. Design tokens ---------- */
+:root {
+  /* palette (unchanged from the original note) */
+  --forest: #2e3a2a;
+  --forest-deep: #1e2819;
+  --sage: #8ba178;
+  --moss: #5c7052;
+  --blush: #e8b4a0;
+  --gold: #d4a24c;
+  --cream: #f6f1e4;
+
+  /* type */
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans: 'Work Sans', sans-serif;
+  --font-hand: 'Caveat', cursive;
+
+  /* timing (named so nothing in script.js/CSS is a bare magic number) */
+  --dur-fade-slow: 1.4s;
+  --dur-fade-medium: 0.8s;
+  --dur-fade-fast: 0.4s;
+  --dur-intro-fade: 0.9s; /* kept in step with CONFIG.intro in script.js */
+  --ease-bloom: cubic-bezier(.34, 1.56, .64, 1);
+
+  /* layout */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  color-scheme: dark;
+}
+
+/* ---------- 2. Reset & base ---------- */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: radial-gradient(ellipse at 50% 0%, var(--forest) 0%, var(--forest-deep) 75%);
+  font-family: var(--font-sans);
+  color: var(--cream);
+  overflow-x: hidden;
+  touch-action: manipulation; /* removes the 300ms tap delay / double-tap zoom */
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  transition: filter 3s ease;
+}
+
+body.garden-bright {
+  filter: brightness(1.1) saturate(1.08);
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* ---------- 3. Ambient layer (fireflies, petals, butterflies, glows) ---------- */
+.ambient-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fireflies, .petals-falling, .butterflies {
+  position: absolute;
+  inset: 0;
+}
+
+.firefly {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 50%;
+  opacity: 0;
+  box-shadow: 0 0 4px 1px rgba(212, 162, 76, 0.6);
+  animation: firefly-drift 6s ease-in-out infinite, firefly-arrive 1.8s ease-out forwards;
+  transition: filter 2s ease, box-shadow 2s ease;
+}
+
+.fireflies.bright .firefly {
+  filter: brightness(1.7);
+  box-shadow: 0 0 9px 2px rgba(212, 162, 76, 0.85);
+}
+
+@keyframes firefly-arrive {
+  from { opacity: 0; }
+  to { opacity: var(--firefly-peak, 0.6); }
+}
+
+@keyframes firefly-drift {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: calc(var(--firefly-peak, 0.6) * 0.35); }
+  50% { transform: translateY(-16px) translateX(7px); opacity: var(--firefly-peak, 0.6); }
+}
+
+.glow-pulse {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, rgba(212, 162, 76, 0.28), transparent 60%);
+  opacity: 0;
+  transition: opacity 2.4s ease;
+}
+.glow-pulse.on {
+  opacity: 1;
+}
+
+/* ---------- 4. Scenes & transitions ---------- */
+#app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  min-height: 100dvh;
+  transition: transform 6s ease-out;
+}
+
+#app.garden-zoom {
+  transform: scale(1.045);
+}
+
+.scene {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: calc(52px + var(--safe-top)) calc(28px + var(--safe-right)) calc(52px + var(--safe-bottom)) calc(28px + var(--safe-left));
+  text-align: center;
+  transition: opacity var(--dur-fade-slow) ease;
+}
+
+.scene[hidden] {
+  display: none;
+}
+
+.scene.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- 5. Scene 1: intro ---------- */
+.scene-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  background: var(--forest-deep);
+}
+
+.intro-text {
+  position: relative;
+  width: 100%;
+  height: 3.6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 44px;
+}
+
+.intro-line {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 5.5vw, 2rem);
+  font-weight: 500;
+  color: var(--sage);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--dur-intro-fade) ease, transform var(--dur-intro-fade) ease;
+}
+
+.intro-line--two {
+  color: var(--cream);
+}
+.intro-line--two em {
+  font-style: italic;
+  color: var(--blush);
+  font-weight: 600;
+}
+
+.intro-line.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.begin-btn {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  padding: 14px 42px;
+  min-height: 48px;
+  border: 1px solid rgba(246, 241, 228, 0.35);
+  border-radius: 999px;
+  color: var(--cream);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--dur-fade-slow) ease, transform var(--dur-fade-slow) ease,
+              background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.begin-btn.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.begin-btn:hover, .begin-btn:focus-visible {
+  background-color: rgba(246, 241, 228, 0.08);
+  border-color: var(--gold);
+}
+
+.scene-intro.is-leaving {
+  opacity: 0;
+  transition: opacity 1.1s ease;
+  pointer-events: none;
+}
+
+/* ---------- 6. Scene 2: garden ---------- */
+.garden-hint {
+  font-size: 15px;
+  color: var(--sage);
+  letter-spacing: 0.02em;
+  margin: 0 0 48px;
+  transition: opacity 0.6s ease;
+}
+
+.garden {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: clamp(14px, 4vw, 28px);
+  flex-wrap: wrap;
+  max-width: 560px;
+}
+
+.plant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 72px;
+  min-height: 44px;
+  padding: 10px 4px;
+  transform-origin: bottom center;
+  animation: plant-sway 7s ease-in-out infinite;
+  animation-delay: calc(var(--plant-index, 0) * -1.1s);
+}
+
+.plant:nth-child(1) { --plant-index: 0; }
+.plant:nth-child(2) { --plant-index: 1; }
+.plant:nth-child(3) { --plant-index: 2; }
+.plant:nth-child(4) { --plant-index: 3; }
+.plant:nth-child(5) { --plant-index: 4; }
+
+@keyframes plant-sway {
+  0%, 100% { transform: rotate(-1.1deg); }
+  50% { transform: rotate(1.1deg); }
+}
+
+.flower {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 6px;
+}
+
+.flower::before {
+  /* soft ambient glow behind the bloomed flower */
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 162, 76, 0.35), transparent 70%);
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.plant.bloomed .flower::before {
+  opacity: 1;
+}
+
+.petal {
+  position: absolute;
+  width: 21px;
+  height: 27px;
+  left: 50%;
+  top: 50%;
+  background: var(--blush);
+  border-radius: 60% 60% 60% 60% / 70% 70% 40% 40%;
+  transform-origin: 50% 100%;
+  transform: translate(-50%, -100%) scale(0);
+  transition: transform 0.55s var(--ease-bloom);
+}
+
+.plant:nth-child(2) .petal { background: var(--gold); }
+.plant:nth-child(3) .petal { background: #d98a9e; }
+.plant:nth-child(4) .petal { background: var(--blush); }
+.plant:nth-child(5) .petal { background: #e0c15c; }
+
+.petal:nth-child(1) { transform: translate(-50%, -100%) rotate(0deg) scale(0); }
+.petal:nth-child(2) { transform: translate(-50%, -100%) rotate(72deg) scale(0); }
+.petal:nth-child(3) { transform: translate(-50%, -100%) rotate(144deg) scale(0); }
+.petal:nth-child(4) { transform: translate(-50%, -100%) rotate(216deg) scale(0); }
+.petal:nth-child(5) { transform: translate(-50%, -100%) rotate(288deg) scale(0); }
+
+/* petals unfold one at a time, each a little later than the last */
+.plant.bloomed .petal:nth-child(1) { transform: translate(-50%, -100%) rotate(0deg) scale(1); transition-delay: 0.85s; }
+.plant.bloomed .petal:nth-child(2) { transform: translate(-50%, -100%) rotate(72deg) scale(1); transition-delay: 0.95s; }
+.plant.bloomed .petal:nth-child(3) { transform: translate(-50%, -100%) rotate(144deg) scale(1); transition-delay: 1.05s; }
+.plant.bloomed .petal:nth-child(4) { transform: translate(-50%, -100%) rotate(216deg) scale(1); transition-delay: 1.15s; }
+.plant.bloomed .petal:nth-child(5) { transform: translate(-50%, -100%) rotate(288deg) scale(1); transition-delay: 1.25s; }
+
+.flower-center {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  left: 50%;
+  top: 50%;
+  background: var(--gold);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.4s var(--ease-bloom) 1.5s;
+  box-shadow: 0 0 8px rgba(212, 162, 76, 0.7);
+}
+.plant.bloomed .flower-center {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.bud {
+  width: 13px;
+  height: 17px;
+  background: var(--moss);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  margin-bottom: 6px;
+  transform: scale(1);
+  opacity: 1;
+  transition: transform 0.3s ease 0.4s, opacity 0.3s ease 0.55s;
+}
+.plant.bloomed .bud {
+  opacity: 0;
+  transform: scale(0.3);
+  position: absolute;
+}
+
+.stem {
+  width: 2px;
+  height: 30px;
+  background: var(--sage);
+  opacity: 0.7;
+  transform-origin: bottom center;
+  transform: scaleY(0.55);
+  transition: transform 0.6s ease;
+}
+.plant.bloomed .stem {
+  transform: scaleY(1);
+}
+
+.word {
+  display: block;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--blush);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.6s ease 1.7s, transform 0.6s ease 1.7s;
+  height: 18px;
+}
+.plant.bloomed .word {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* quick, satisfying tap feedback, independent of the bloom transition */
+.plant.tap-bounce .flower,
+.plant.tap-bounce .bud {
+  animation: tap-bounce 0.32s ease;
+}
+@keyframes tap-bounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.88); }
+  100% { transform: scale(1); }
+}
+
+/* sparkle particles spawned once, on the moment of bloom */
+.sparkle-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.sparkle-particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 5px 1px rgba(212, 162, 76, 0.8);
+  opacity: 0;
+  animation: sparkle-fly 0.9s ease-out forwards;
+  animation-delay: var(--sparkle-delay, 0s);
+}
+@keyframes sparkle-fly {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  25% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--sparkle-x, 20px)), calc(-50% + var(--sparkle-y, -20px))) scale(0.2);
+  }
+}
+
+/* ---------- 7. Butterflies ---------- */
+.butterfly {
+  position: absolute;
+  top: var(--start-y, 40%);
+  left: var(--start-x, -8%);
+  width: 16px;
+  height: 14px;
+  opacity: 0;
+  animation:
+    butterfly-path var(--flight-duration, 18s) ease-in-out forwards,
+    butterfly-fade 2s ease forwards;
+}
+.butterfly-wing {
+  position: absolute;
+  inset: 0;
+  animation: wing-flutter 0.28s ease-in-out infinite alternate;
+}
+.butterfly-wing::before,
+.butterfly-wing::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 12px;
+  background: var(--blush);
+  border-radius: 70% 30% 70% 30%;
+  opacity: 0.85;
+}
+.butterfly-wing::before { left: 0; transform-origin: right center; }
+.butterfly-wing::after { right: 0; transform-origin: left center; background: var(--gold); }
+
+@keyframes wing-flutter {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.55); }
+}
+@keyframes butterfly-fade {
+  0% { opacity: 0; }
+  15% { opacity: 0.95; }
+  85% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+@keyframes butterfly-path {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(calc(var(--travel-x, 60vw) * 0.28), calc(var(--travel-y, 10vh) * -0.6)) rotate(-6deg); }
+  50%  { transform: translate(calc(var(--travel-x, 60vw) * 0.55), calc(var(--travel-y, 10vh) * 0.4)) rotate(4deg); }
+  75%  { transform: translate(calc(var(--travel-x, 60vw) * 0.78), calc(var(--travel-y, 10vh) * -0.3)) rotate(-3deg); }
+  100% { transform: translate(var(--travel-x, 60vw), 0) rotate(0deg); }
+}
+
+/* ---------- 8. Falling petals ---------- */
+.falling-petal {
+  position: absolute;
+  top: -5%;
+  left: var(--petal-x, 50%);
+  width: 9px;
+  height: 12px;
+  background: var(--blush);
+  border-radius: 60% 60% 60% 60% / 70% 70% 40% 40%;
+  opacity: 0;
+  animation: petal-fall var(--fall-duration, 9s) linear forwards;
+}
+@keyframes petal-fall {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  6%   { opacity: 0.8; }
+  92%  { opacity: 0.6; }
+  100% { opacity: 0; transform: translate(var(--petal-drift, 40px), 105vh) rotate(200deg); }
+}
+
+/* ---------- 9. Scene 3: the magic moment & message ---------- */
+.finale {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: calc(40px + var(--safe-top)) calc(28px + var(--safe-right)) calc(40px + var(--safe-bottom)) calc(28px + var(--safe-left));
+  text-align: center;
+  pointer-events: none;
+}
+
+/* a soft warm scrim so the title and message stay legible over the
+   garden still blooming behind them, instead of the two overlapping */
+.finale::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at 50% 45%, rgba(30, 40, 25, 0.55), rgba(30, 40, 25, 0.85) 72%);
+  opacity: 0;
+  transition: opacity 2.2s ease;
+}
+.finale.active::before {
+  opacity: 1;
+}
+
+.finale-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 9vw, 3.8rem);
+  line-height: 1.05;
+  margin: 0;
+}
+
+.title-line {
+  display: block;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+.title-line.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.title-line--b em {
+  font-style: italic;
+  color: var(--blush);
+  font-weight: 600;
+}
+
+.message-box {
+  max-width: 480px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 1.3s ease, transform 1.3s ease;
+}
+.message-box.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.message {
+  font-family: var(--font-hand);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 5vw, 1.9rem);
+  line-height: 1.5;
+  color: var(--cream);
+  margin: 30px 0 8px;
+}
+
+.signoff {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--gold);
+  margin-top: 6px;
+}
+
+/* ---------- 10. Music button ---------- */
+.music-btn {
+  position: fixed;
+  right: calc(18px + var(--safe-right));
+  bottom: calc(18px + var(--safe-bottom));
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(30, 40, 25, 0.72);
+  border: 1px solid rgba(246, 241, 228, 0.25);
+  backdrop-filter: blur(6px);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--cream);
+  transition: background-color 0.3s ease, border-color 0.3s ease, opacity 0.4s ease;
+}
+.music-btn:hover, .music-btn:focus-visible {
+  border-color: var(--gold);
+  background: rgba(30, 40, 25, 0.9);
+}
+.music-icon {
+  color: var(--gold);
+}
+
+/* ---------- 11. Hidden surprise: tiny tap stars ---------- */
+.tap-star {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cream);
+  box-shadow: 0 0 8px 2px rgba(246, 241, 228, 0.8);
+  transform: translate(-50%, -50%);
+  animation: tap-star-fade 2s ease-out forwards;
+}
+@keyframes tap-star-fade {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+}
+
+/* ---------- 12. Responsive tweaks ---------- */
+/* Covers essentially every phone in portrait (320-480px). Sized so all
+   five columns fit in one row without wrapping: 5 * 52px + 4 * 6px = 284px,
+   well inside even a 320px-wide viewport once padding is trimmed too. */
+@media (max-width: 480px) {
+  .scene-garden { padding-left: 16px; padding-right: 16px; }
+  .garden { gap: 6px; }
+  .plant { width: 52px; }
+}
+
+@media (min-width: 700px) {
+  .garden { gap: 32px; }
+}
+
+/* ---------- 13. Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition-duration: 0.35s !important;
+    transition-delay: 0s !important;
+  }
+  #app.garden-zoom {
+    transform: none;
+  }
+  .falling-petal,
+  .butterfly {
+    display: none;
+  }
+}

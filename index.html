@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e2819">
+<meta name="description" content="A small, handcrafted birthday garden for Bea.">
+<title>Happy Birthday, Bea</title>
+
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500;1,600&family=Work+Sans:wght@300;400;500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Ambient layer: fireflies, falling petals, butterflies and the golden
+     magic-moment glow all live here, above the scenes but never blocking taps -->
+<div class="ambient-layer" aria-hidden="true">
+  <div class="fireflies" id="fireflies"></div>
+  <div class="petals-falling" id="petalsFalling"></div>
+  <div class="butterflies" id="butterflies"></div>
+  <div class="glow-pulse" id="glowPulse"></div>
+  <div class="tap-sparkles" id="tapSparkles"></div>
+</div>
+
+<main id="app">
+
+  <!-- Scene 1: dark, elegant intro -->
+  <section class="scene scene-intro" id="sceneIntro">
+    <div class="intro-text" aria-live="polite">
+      <p class="intro-line intro-line--one">A little birthday surprise&hellip;</p>
+      <p class="intro-line intro-line--two">For <em>Bea</em></p>
+    </div>
+    <button type="button" class="begin-btn" id="beginBtn">Begin</button>
+  </section>
+
+  <!-- Scene 2: the garden -->
+  <section class="scene scene-garden" id="sceneGarden" hidden>
+    <p class="garden-hint" id="gardenHint" aria-live="polite">Help the garden bloom.</p>
+
+    <div class="garden" id="garden">
+
+      <button type="button" class="plant" data-word="warm" aria-label="Tap to bloom a flower for: warm">
+        <span class="flower">
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="flower-center"></span>
+          <span class="sparkle-burst"></span>
+        </span>
+        <span class="bud"></span>
+        <span class="stem"></span>
+        <span class="word">warm</span>
+      </button>
+
+      <button type="button" class="plant" data-word="generous" aria-label="Tap to bloom a flower for: generous">
+        <span class="flower">
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="flower-center"></span>
+          <span class="sparkle-burst"></span>
+        </span>
+        <span class="bud"></span>
+        <span class="stem"></span>
+        <span class="word">generous</span>
+      </button>
+
+      <button type="button" class="plant" data-word="kind" aria-label="Tap to bloom a flower for: kind">
+        <span class="flower">
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="flower-center"></span>
+          <span class="sparkle-burst"></span>
+        </span>
+        <span class="bud"></span>
+        <span class="stem"></span>
+        <span class="word">kind</span>
+      </button>
+
+      <button type="button" class="plant" data-word="joyful" aria-label="Tap to bloom a flower for: joyful">
+        <span class="flower">
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="flower-center"></span>
+          <span class="sparkle-burst"></span>
+        </span>
+        <span class="bud"></span>
+        <span class="stem"></span>
+        <span class="word">joyful</span>
+      </button>
+
+      <button type="button" class="plant" data-word="loved" aria-label="Tap to bloom a flower for: loved">
+        <span class="flower">
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="petal"></span>
+          <span class="flower-center"></span>
+          <span class="sparkle-burst"></span>
+        </span>
+        <span class="bud"></span>
+        <span class="stem"></span>
+        <span class="word">loved</span>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- Scene 3: the magic moment -- title and message, revealed above the garden -->
+  <section class="finale" id="finale" aria-hidden="true">
+    <h1 class="finale-title">
+      <span class="title-line title-line--a">Happy Birthday</span>
+      <span class="title-line title-line--b"><em>Bea</em></span>
+    </h1>
+    <div class="message-box" id="messageBox">
+      <p class="message">
+        Hope you're having a wonderful day. You bring so much warmth to everyone around you, and I really appreciate how welcoming you've been to me. Wishing you a year ahead full of good health, happiness, and time with the people you love.
+      </p>
+      <p class="signoff">Sina</p>
+    </div>
+  </section>
+
+</main>
+
+<button type="button" class="music-btn" id="musicBtn" aria-pressed="false">
+  <span class="music-icon" aria-hidden="true">&#9834;</span>
+  <span class="music-label" id="musicLabel">Play Music</span>
+</button>
+
+<audio id="bgMusic" loop preload="none"></audio>
+
+<script src="script.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "Happy Birthday, Bea",
+  "short_name": "Bea's Garden",
+  "description": "A small, handcrafted birthday garden for Bea.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1e2819",
+  "theme_color": "#1e2819",
+  "icons": [
+    {
+      "src": "assets/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
